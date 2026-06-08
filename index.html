@@ -1,0 +1,1189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Raja Mantri - 7 Player Master Edition</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #1e0034 0%, #0d001a 50%, #001233 100%);
+            color: #ffffff;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            height: 100vh;
+            width: 100vw;
+            overflow-x: hidden; 
+            overflow-y: auto;
+        }
+        #app-container {
+            width: 100%;
+            max-width: 100%;
+            min-height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            padding: 40px 12px;
+            text-align: center;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        .top-nav-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 380px;
+            padding: 0 5px;
+            margin-bottom: -15px;
+            z-index: 100;
+        }
+        .header-controls-right {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .header-utility-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            color: #00fff0;
+            padding: 8px 14px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        .close-icon-btn {
+            background: rgba(255, 71, 87, 0.1);
+            border: 1px solid rgba(255, 71, 87, 0.4);
+            color: #ff4757;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            font-weight: 300;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            line-height: 1;
+            padding-bottom: 2px;
+        }
+        .header-utility-btn:active, .close-icon-btn:active { transform: scale(0.92); }
+
+        .game-card {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 28px;
+            padding: 35px 15px;
+            width: 100%;
+            max-width: 380px;
+            margin-top: 35px;
+            box-shadow: 0 25px 60px rgba(114, 0, 218, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+            animation: cardFadeIn 0.4s ease-out;
+            overflow: hidden;
+            position: relative;
+        }
+
+        #role {
+            font-size: clamp(1.9rem, 7vw, 3.5rem);
+            font-weight: 900;
+            color: #00fff0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 10px 0;
+            text-shadow: 0 0 25px rgba(0, 255, 240, 0.5);
+            white-space: nowrap;
+        }
+        #points { width: 100%; margin: 15px 0; }
+        #status { font-size: 1.05rem; color: rgba(255, 255, 255, 0.65); line-height: 1.5; margin-bottom: 5px; }
+        
+        .guess-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            width: 100%;
+            margin-top: 20px;
+        }
+        
+        .ui-btn {
+            background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: white;
+            padding: 16px 12px;
+            font-size: 1rem;
+            font-weight: 700;
+            border-radius: 16px;
+            cursor: pointer;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+        }
+        .ui-btn:active {
+            transform: scale(0.95);
+            background: rgba(157, 0, 255, 0.3);
+            border-color: #9d00fffb;
+        }
+
+        .dominant-btn {
+            background: linear-gradient(135deg, #00fff0 0%, #00a8ff 100%);
+            border: none;
+            color: #110022;
+            padding: 16px 40px;
+            font-size: 1.1rem;
+            font-weight: 900;
+            border-radius: 40px;
+            cursor: pointer;
+            margin-top: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            width: 100%;
+            max-width: 380px;
+            box-shadow: 0 10px 30px rgba(0, 255, 240, 0.35);
+            animation: pulseGlow 2s infinite ease-in-out;
+        }
+
+        .nav-btn {
+            background: linear-gradient(135deg, #7200da 0%, #4a0099 100%);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #ffffff;
+            padding: 12px 28px;
+            font-size: 0.9rem;
+            font-weight: 800;
+            border-radius: 40px;
+            cursor: pointer;
+            margin-top: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            width: 100%;
+            max-width: 380px;
+        }
+        .nav-btn:active { transform: scale(0.95); }
+        .back-btn {
+            background: rgba(255, 71, 87, 0.1);
+            border: 1px solid #ff4757;
+            color: #ff4757;
+            box-shadow: 0 8px 25px rgba(255, 71, 87, 0.1);
+        }
+
+        .modal-action-wrapper { display: flex; flex-direction: column; gap: 12px; width: 100%; margin-top: 15px; }
+        .modal-choice-btn {
+            width: 100%;
+            padding: 14px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            border-radius: 14px;
+            cursor: pointer;
+            border: none;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+        }
+        .modal-choice-btn.cancel-round { background: rgba(255, 71, 87, 0.15); border: 1px solid #ff4757; color: #ff4757; }
+        .modal-choice-btn.end-tournament { background: linear-gradient(135deg, #00fff0 0%, #00a8ff 100%); color: #110022; }
+        .modal-choice-btn.dismiss-modal { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); color: #ffffff; margin-top: 5px; }
+
+        /* COMPACT SETTINGS PANEL CONFIG */
+        .settings-panel { 
+            width: 100%; 
+            text-align: left; 
+            max-height: 60vh; 
+            overflow-y: auto; 
+            padding-right: 2px;
+            overflow-x: hidden; 
+        }
+        .settings-heading {
+            font-size: 0.85rem;
+            color: #00fff0;
+            margin: 20px 0 10px 0;
+            border-bottom: 1px solid rgba(0, 255, 240, 0.2);
+            padding-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .card-wrapper {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 8px 10px;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+        }
+        
+        .card-wrapper.sortable-dragging {
+            opacity: 0.4;
+            background: rgba(114, 0, 218, 0.2);
+            border-color: #00fff0;
+        }
+        
+        .input-group { 
+            display: flex; 
+            align-items: center; 
+            flex: 1; 
+            margin-right: 6px;
+            min-width: 0; 
+        }
+        .input-group label {
+            width: 70px;
+            font-weight: 700;
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.4);
+            text-transform: uppercase;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .input-group input {
+            flex: 1;
+            background: #110022;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: white;
+            padding: 6px 8px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            min-width: 0; 
+        }
+        .input-group input:focus { border-color: #00fff0; outline: none; }
+        .input-group input[type="checkbox"] {
+            flex: none;
+            width: 16px;
+            height: 16px;
+            margin-right: 8px;
+            accent-color: #00fff0;
+            cursor: pointer;
+        }
+        
+        .drag-handle-column {
+            color: rgba(255, 255, 255, 0.25);
+            font-size: 1.1rem;
+            cursor: grab;
+            padding: 0 4px 0 8px;
+            flex-shrink: 0;
+            touch-action: none; 
+        }
+        .drag-handle-column:active { cursor: grabbing; color: #00fff0; }
+
+        .action-icon-btn {
+            background: rgba(0, 255, 240, 0.15);
+            border: 1px solid #00fff0;
+            color: #00fff0;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .action-icon-btn.remove {
+            background: rgba(255, 71, 87, 0.15);
+            border: 1px solid #ff4757;
+            color: #ff4757;
+            margin-left: 4px;
+        }
+
+        .reveal-prominent-box {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px dashed rgba(255, 255, 255, 0.15);
+            border-radius: 16px;
+            padding: 15px;
+            margin: 15px 0;
+            text-align: left;
+        }
+        .reveal-line { font-size: 1.15rem; margin-bottom: 8px; color: rgba(255,255,255,0.85); }
+        .reveal-line:last-child { margin-bottom: 0; }
+        .reveal-label { font-weight: bold; color: rgba(255,255,255,0.4); font-size: 0.85rem; text-transform: uppercase; }
+        .flash-txt-highlight { animation: textBrightFlash 1s infinite ease-in-out; font-weight: 900; }
+
+        .table-wrap {
+            width: 100%;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        .flash-active-frame { animation: pulseAttentionBorder 1.5s infinite ease-in-out; cursor: pointer; }
+        table { border-collapse: collapse; width: 100%; table-layout: fixed; }
+        th, td {
+            padding: 8px 3px;
+            text-align: center;
+            font-size: 0.72rem; 
+            font-weight: 600;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            border-right: 1px solid rgba(255, 255, 255, 0.06);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        th:first-child, td:first-child { width: 38px; }
+        th { background-color: rgba(255, 255, 255, 0.04); color: rgba(255, 255, 255, 0.5); text-transform: uppercase; font-size: 0.68rem; }
+        .total-row { background-color: rgba(0, 255, 240, 0.06); }
+        .total-row td { color: #00fff0 !important; font-weight: 800; border-top: 1px solid rgba(0, 255, 240, 0.3); }
+
+        @keyframes cardFadeIn { from { transform: scale(0.96); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        @keyframes pulseGlow { 0%, 100% { box-shadow: 0 10px 30px rgba(0, 255, 240, 0.35); } 50% { box-shadow: 0 10px 40px rgba(0, 255, 240, 0.6); transform: translateY(-1px); } }
+        @keyframes pulseAttentionBorder { 0%, 100% { border-color: rgba(255, 255, 255, 0.15); box-shadow: 0 25px 60px rgba(114, 0, 218, 0.25); } 50% { border-color: rgba(0, 255, 240, 0.6); box-shadow: 0 25px 60px rgba(0, 255, 240, 0.25); } }
+        @keyframes textBrightFlash { 0%, 100% { filter: brightness(1); transform: scale(1); } 50% { filter: brightness(1.5); text-shadow: 0 0 15px currentColor; } }
+    </style>
+</head>
+<body>
+
+    <div id="app-container">
+        <div class="top-nav-bar">
+            <button class="header-utility-btn" onclick="toggleMusic()">🔇 Music: OFF</button>
+            <div class="header-controls-right" id="nav-utility-shelf">
+                <button class="header-utility-btn" onclick="openSettingsDashboard()">⚙️ Settings</button>
+                <button class="close-icon-btn" onclick="triggerLifecycleConfirmationIntercept()">×</button>
+            </div>
+        </div>
+        
+        <div class="game-card" id="interactive-card-shell">
+            <div id="role">TAP TO DRAW</div>
+            <div id="points"></div>
+            <div id="status">Chits remaining: 7</div>
+        </div>
+        
+        <div id="action-shelf"></div>
+    </div>
+
+    <script>
+        // FIXED UPDATED DATA ARRAYS: Default configured to matching 7 structural items profile matrixes
+        let masterPlayersList = [
+            { name: "Lekhana", active: true },
+            { name: "Delson", active: true },
+            { name: "Kumar", active: true },
+            { name: "Dennis", active: true },
+            { name: "Ata", active: true },
+            { name: "Gayathry", active: true },
+            { name: "Shanthi", active: true }
+        ];
+
+        let masterRolesList = [
+            { name: "Raja", points: 10000, color: "#ffdf00", type: "Raja" },
+            { name: "Rani", points: 8000, color: "#ff47a1", type: "Rani" },
+            { name: "Manthri", points: 6000, color: "#2ed573", type: "Manthri" },
+            { name: "Senapathi", points: 5000, color: "#ffa500", type: "Senapathi" },
+            { name: "Police", points: 4000, color: "#1e90ff", type: "Police" },
+            { name: "Sipaahi", points: 2000, color: "#a4b0be", type: "Sipaahi" },
+            { name: "Chor", points: 0, color: "#ff4757", type: "Chor" }
+        ];
+
+        let playerNames = [];
+        let characterRoles = [];
+        let currentPool = [];
+        let historyPool = []; 
+        let allRoundsData = []; 
+        
+        let turnCount = 0;
+        let isCardVisible = false; 
+        let isGameOverState = false;
+        let isRevealIntermediateState = false; 
+        let isGuessingPhase = false; 
+        let isHandoverPhase = false; 
+        let currentViewState = "GAME"; 
+
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        let audioCtx = null;
+        let isMusicPlaying = false;
+        let musicLoopId = null;
+        let currentNoteIndex = 0;
+        let musicVolumeControl = null; 
+
+        const gameMelody = [
+            [261.63, 0.4], [329.63, 0.4], [392.00, 0.4], [329.63, 0.4]
+        ];
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new AudioCtx();
+                musicVolumeControl = audioCtx.createGain();
+                musicVolumeControl.gain.setValueAtTime(0.015, audioCtx.currentTime);
+                musicVolumeControl.connect(audioCtx.destination);
+            }
+        }
+
+        const dialoguePool = {
+            gameStart: [(p) => `Welcome everyone!... ${p}, tap the screen and take your chit!`],
+            playerTurn: [
+                (p) => `${p},... you are up!`,
+                (p) => `${p},... take a chit.`
+            ],
+            policeDraw: [(p, role) => `Oh! ${p},... you are the ${role}! Memorize your role!`],
+            handover: [(p) => `All chits are out!... Pass the phone to ${p} right now.`],
+            guessingPrompt: [(p, cop, thief) => `${p},... look at the suspects on the screen and guess who is the ${thief}!`],
+            correctGuess: [(p, thief) => `Brilliant work!... Spot on! ${p} was indeed the hidden ${thief}!`],
+            wrongGuess: [(p, innocent, actual, thief) => `Wrong guess! ${p} is a ${innocent}. The real ${thief} was actually ${actual}!`],
+            leaderBoard: [(p, pts) => `The current champion leading the scoreboard is... ${p}... with ${pts} points!`],
+            gameOverAnnouncement: [(p, pts) => `The tournament has ended! The absolute champion is... ${p}... scoring a total of ${pts} points! Game over.`]
+        };
+
+        function getRandomDialogue(type, ...args) {
+            const lines = dialoguePool[type];
+            return lines[Math.floor(Math.random() * lines.length)](...args);
+        }
+
+        function speakDialogue(text) {
+            try {
+                window.speechSynthesis.cancel();
+                if (isMusicPlaying && musicVolumeControl) { musicVolumeControl.gain.setValueAtTime(0.002, audioCtx.currentTime); }
+                const utterance = new SpeechSynthesisUtterance(text);
+                let voices = window.speechSynthesis.getVoices();
+                let premiumVoice = voices.find(v => v.lang.startsWith('en') && (v.name.toLowerCase().includes('premium') || v.name.toLowerCase().includes('enhanced') || v.name.toLowerCase().includes('neural')));
+                if (!premiumVoice) premiumVoice = voices.find(v => v.lang.startsWith('en') && v.name.toLowerCase().includes('female'));
+                if (premiumVoice) utterance.voice = premiumVoice;
+                utterance.rate = 0.92;   
+                utterance.pitch = 1.02;  
+                utterance.onend = function() {
+                    if (isMusicPlaying && musicVolumeControl) { musicVolumeControl.gain.linearRampToValueAtTime(0.015, audioCtx.currentTime + 0.4); }
+                };
+                window.speechSynthesis.speak(utterance);
+            } catch(e) {}
+        }
+
+        function playStep() {
+            if (!isMusicPlaying) return;
+            let note = gameMelody[currentNoteIndex];
+            let osc = audioCtx.createOscillator();
+            osc.type = 'triangle';
+            osc.frequency.value = note[0];
+            osc.connect(musicVolumeControl);
+            osc.start();
+            osc.stop(audioCtx.currentTime + note[1]);
+            currentNoteIndex = (currentNoteIndex + 1) % gameMelody.length;
+            musicLoopId = setTimeout(playStep, note[1] * 1000);
+        }
+
+        window.toggleMusic = function() {
+            initAudio();
+            const btn = document.getElementById('music-toggle-btn');
+            if (!isMusicPlaying) {
+                isMusicPlaying = true;
+                btn.innerText = "🔊 Music: ON";
+                btn.style.color = "#2ed573";
+                playStep();
+            } else {
+                isMusicPlaying = false;
+                btn.innerText = "🔇 Music: OFF";
+                btn.style.color = "#00fff0";
+                clearTimeout(musicLoopId);
+            }
+        }
+
+        function playBeep(frequency = 440, duration = 0.08) {
+            try {
+                initAudio();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.value = frequency;
+                gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch(e) {}
+        }
+
+        function playSiren() {
+            try {
+                initAudio();
+                for(let i=0; i < 2; i++) {
+                    const timeOffset = i * 0.6;
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(i % 2 === 0 ? 650 : 480, audioCtx.currentTime + timeOffset);
+                    gain.gain.setValueAtTime(0.06, audioCtx.currentTime + timeOffset);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + timeOffset + 0.55);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(audioCtx.currentTime + timeOffset);
+                    osc.stop(audioCtx.currentTime + timeOffset + 0.6);
+                }
+            } catch(e) {}
+        }
+
+        function syncActiveSettingsFramework() {
+            playerNames = masterPlayersList.filter(p => p.active).map(p => p.name);
+            characterRoles = masterRolesList.slice(0, playerNames.length);
+            
+            let hasPolice = characterRoles.some(r => r.type === "Police");
+            let hasThief = characterRoles.some(r => r.type === "Chor");
+            if (!hasPolice || !hasThief) {
+                characterRoles = masterRolesList.filter(r => r.type === "Police" || r.type === "Chor");
+                let remainingSlotCount = playerNames.length - 2;
+                let componentsAdded = 0;
+                for(let i=0; i<masterRolesList.length; i++) {
+                    if(componentsAdded >= remainingSlotCount) break;
+                    let targetElement = masterRolesList[i];
+                    if(targetElement.type !== "Police" && targetElement.type !== "Chor") {
+                        characterRoles.push(targetElement);
+                        componentsAdded++;
+                    }
+                }
+            }
+        }
+
+        function shufflePool() {
+            currentPool = characterRoles.map(role => ({...role}));
+            historyPool = [];
+            for (let i = currentPool.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [currentPool[i], currentPool[j]] = [currentPool[j], currentPool[i]];
+            }
+            isGameOverState = false;
+            isRevealIntermediateState = false;
+            isGuessingPhase = false;
+            isHandoverPhase = false;
+            document.getElementById('interactive-card-shell').classList.remove('flash-active-frame');
+        }
+
+        function renderActionShelf() {
+            const shelf = document.getElementById('action-shelf');
+            if (isCardVisible || isGuessingPhase || isHandoverPhase || isRevealIntermediateState || currentViewState === "CONFIRMATION_INTERCEPT") {
+                shelf.innerHTML = "";
+                return;
+            }
+
+            if (currentViewState === "GAME") {
+                if (isGameOverState) {
+                    shelf.innerHTML = `
+                        <button class="dominant-btn" onclick="triggerNextRoundSetup()">Next Round</button><br>
+                        ${allRoundsData.length > 0 ? '<button class="nav-btn" onclick="renderGrandLeaderboard()">Grand Standings</button><br>' : ''}
+                    `;
+                } else {
+                    shelf.innerHTML = `
+                        ${allRoundsData.length > 0 ? '<button class="nav-btn" onclick="renderGrandLeaderboard()">Grand Standings</button><br>' : ''}
+                    `;
+                }
+            } else if (currentViewState === "SETTINGS") {
+                shelf.innerHTML = `<button class="nav-btn back-btn" onclick="saveAndExitSettings()">💾 Save Configuration</button>`;
+            } else {
+                shelf.innerHTML = `<button class="nav-btn back-btn" onclick="exitScoreboardView()">← Close Standings</button>`;
+            }
+        }
+
+        function resetForNextTurn() {
+            document.getElementById('role').innerText = "TAP TO DRAW";
+            document.getElementById('role').style.color = "#00fff0";
+            document.getElementById('role').style.textShadow = "0 0 20px rgba(0, 255, 240, 0.3)";
+            document.getElementById('points').innerHTML = "";
+            document.getElementById('status').innerText = `Chits remaining inside deck: ${playerNames.length - turnCount}`;
+            isCardVisible = false;
+            isRevealIntermediateState = false;
+            currentViewState = "GAME";
+            document.getElementById('interactive-card-shell').classList.remove('flash-active-frame');
+            document.getElementById('nav-utility-shelf').style.visibility = "visible"; 
+            renderActionShelf();
+
+            if (turnCount < playerNames.length) {
+                speakDialogue(getRandomDialogue('playerTurn', playerNames[turnCount]));
+            }
+        }
+
+        function handleScreenTap() {
+            if (currentViewState !== "GAME" || isGuessingPhase) return;
+
+            if (isRevealIntermediateState) {
+                isRevealIntermediateState = false;
+                injectActiveRoundFlashingReview();
+                return;
+            }
+
+            if (isHandoverPhase) {
+                activateGuessingControls();
+                return;
+            }
+
+            if (isGameOverState && !isCardVisible) { 
+                triggerNextRoundSetup(); 
+                return; 
+            }
+
+            if (isCardVisible) {
+                if (turnCount < playerNames.length) { 
+                    resetForNextTurn(); 
+                } else { 
+                    setupHandoverScreen(); 
+                }
+                return;
+            }
+
+            const currentChit = currentPool.pop();
+            historyPool.push(currentChit); 
+            turnCount++;
+
+            document.getElementById('nav-utility-shelf').style.visibility = "hidden";
+
+            const roleEl = document.getElementById('role');
+            roleEl.innerText = currentChit.name;
+            roleEl.style.color = currentChit.color;
+            roleEl.style.textShadow = `0 0 25px ${currentChit.color}50`;
+            
+            document.getElementById('points').innerHTML = `<div style='font-size:1.8rem; font-weight:800; color:#ffdf00; margin-top:10px;'>Value: ${currentChit.points.toLocaleString()}</div>`;
+            document.getElementById('status').innerText = `Hey ${playerNames[turnCount - 1]}, memorize this and tap anywhere to clear!`;
+            isCardVisible = true;
+            renderActionShelf();
+
+            if(currentChit.type === "Police") {
+                playSiren();
+                let policeRoleName = characterRoles.find(c => c.type === "Police").name;
+                setTimeout(() => { speakDialogue(getRandomDialogue('policeDraw', playerNames[turnCount - 1], policeRoleName)); }, 150);
+            } else {
+                playBeep(587.33, 0.08); 
+            }
+        }
+
+        function setupHandoverScreen() {
+            isCardVisible = false;
+            isHandoverPhase = true;
+            renderActionShelf();
+
+            let policeIndex = historyPool.findIndex(c => c.type === "Police");
+            let policeTargetName = playerNames[policeIndex];
+
+            const roleEl = document.getElementById('role');
+            roleEl.innerText = "HANDOVER";
+            roleEl.style.color = "#eccc68";
+            roleEl.style.textShadow = "0 0 20px rgba(236, 204, 104, 0.3)";
+            
+            document.getElementById('points').innerHTML = `<div style="font-size:1.2rem; padding:10px; color:rgba(255,255,255,0.8);">Pass device over to <strong>${policeTargetName}</strong></div>`;
+            document.getElementById('status').innerText = `Tap anywhere on the card container once ${policeTargetName} is holding the phone.`;
+
+            speakDialogue(getRandomDialogue('handover', policeTargetName));
+        }
+
+        function activateGuessingControls() {
+            isHandoverPhase = false;
+            isGuessingPhase = true;
+
+            let policeIndex = historyPool.findIndex(c => c.type === "Police");
+            let policePlayerName = playerNames[policeIndex];
+            let policeRoleName = characterRoles.find(c => c.type === "Police").name;
+            let chorCurrentName = characterRoles.find(c => c.type === "Chor").name;
+
+            const roleEl = document.getElementById('role');
+            roleEl.innerText = "INTERROGATE";
+            roleEl.style.color = "#1e90ff";
+            roleEl.style.textShadow = "0 0 20px rgba(30, 144, 255, 0.3)";
+
+            document.getElementById('status').innerText = `${policePlayerName}, select who you think holds the ${chorCurrentName} card.`;
+
+            let buttonsHTML = `<div class='guess-container'>`;
+            for (let i = 0; i < playerNames.length; i++) {
+                if (i === policeIndex) continue;
+                buttonsHTML += `<button class='ui-btn' onclick='submitPoliceGuess(${i})'>${playerNames[i]}</button>`;
+            }
+            buttonsHTML += `</div>`;
+            document.getElementById('points').innerHTML = buttonsHTML;
+
+            speakDialogue(getRandomDialogue('guessingPrompt', policePlayerName, policeRoleName, chorCurrentName));
+        }
+
+        window.submitPoliceGuess = function(suspectIndex) {
+            isGuessingPhase = false;
+            isRevealIntermediateState = true; 
+
+            let policeItem = historyPool.find(c => c.type === "Police");
+            let chorItem = historyPool.find(c => c.type === "Chor");
+            let chosenItem = historyPool[suspectIndex];
+
+            let policeRoleName = characterRoles.find(c => c.type === "Police").name;
+            let chorRoleName = characterRoles.find(c => c.type === "Chor").name;
+            let chorPlayerIndex = historyPool.findIndex(c => c.type === "Chor");
+            let chorActualPlayerName = playerNames[chorPlayerIndex];
+
+            let isCorrect = (chosenItem.type === "Chor");
+            
+            if (isCorrect) {
+                playBeep(880, 0.3);
+            } else {
+                playBeep(220, 0.4);
+                let tempPolicePoints = policeItem.points;
+                policeItem.points = chorItem.points;
+                chorItem.points = tempPolicePoints;
+            }
+
+            allRoundsData.push([...historyPool]);
+            document.getElementById('nav-utility-shelf').style.visibility = "visible";
+
+            const roleEl = document.getElementById('role');
+            roleEl.innerText = isCorrect ? "SUCCESS!" : "FAILED!";
+            roleEl.style.color = isCorrect ? "#2ed573" : "#ff4757";
+            roleEl.style.textShadow = isCorrect ? "0 0 25px rgba(46, 213, 115, 0.5)" : "0 0 25px rgba(255, 71, 87, 0.5)";
+
+            let chosenRoleObject = characterRoles.find(r => r.type === chosenItem.type);
+            let thiefRoleObject = characterRoles.find(r => r.type === "Chor");
+
+            document.getElementById('points').innerHTML = `
+                <div class="reveal-prominent-box" style="border-color: ${isCorrect ? '#2ed573' : '#ff4757'}">
+                    <div class="reveal-line">
+                        <span class="reveal-label">Suspect Picked:</span> <br>
+                        <strong>${playerNames[suspectIndex]}</strong> was a <span style="color:${chosenRoleObject.color}; font-weight:800">${chosenItem.name}</span>
+                    </div>
+                    <div class="reveal-line" style="margin-top:14px; border-top: 1px rgba(255,255,255,0.05) solid; padding-top:10px;">
+                        <span class="reveal-label">The True Criminal:</span> <br>
+                        <span class="flash-txt-highlight" style="color:${thiefRoleObject.color}">${chorActualPlayerName}</span> is the <span style="color:${thiefRoleObject.color}; font-weight:800">${chorRoleName}</span>!
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('status').innerText = "👉 Tap anywhere on the card to review full round scores.";
+            document.getElementById('interactive-card-shell').classList.add('flash-active-frame');
+
+            let vocalScript = isCorrect 
+                ? `Excellent job! Correct guess! ${playerNames[suspectIndex]} was indeed the hidden ${chorRoleName}!`
+                : `Wrong guess! ${playerNames[suspectIndex]} was actually a ${chosenItem.name}! The real ${chorRoleName} was ${chorActualPlayerName}!`;
+            speakDialogue(vocalScript);
+        };
+
+        function injectActiveRoundFlashingReview() {
+            isGameOverState = true;
+            
+            let tableHTML = `<div class='table-wrap'><table><tr><th style="width:38px;">Idx</th><th>Player Profile</th><th>Chit Role</th><th>Bounty</th></tr>`;
+            historyPool.forEach((chit, index) => {
+                tableHTML += `<tr><td>${index+1}</td><td><strong>${playerNames[index]}</strong></td><td style="color:${chit.color}; font-weight:800">${chit.name}</td><td>${chit.points.toLocaleString()}</td></tr>`;
+            });
+            tableHTML += `</table></div>`;
+
+            const roleEl = document.getElementById('role');
+            roleEl.innerText = "ROUND OVER";
+            roleEl.style.color = "#00fff0";
+            roleEl.style.textShadow = "0 0 20px rgba(0, 255, 240, 0.4)";
+            
+            document.getElementById('points').innerHTML = tableHTML;
+            document.getElementById('status').innerText = "⚡ Tap screen anywhere to play next round instantly!";
+            
+            document.getElementById('interactive-card-shell').classList.add('flash-active-frame');
+            renderActionShelf();
+        }
+
+        window.triggerLifecycleConfirmationIntercept = function() {
+            playBeep(600, 0.12);
+            currentViewState = "CONFIRMATION_INTERCEPT";
+            renderActionShelf();
+
+            const roleEl = document.getElementById('role');
+            roleEl.innerText = "END GAME?";
+            roleEl.style.color = "#ffdf00";
+            roleEl.style.textShadow = "0 0 25px rgba(255, 223, 0, 0.4)";
+
+            document.getElementById('points').innerHTML = `
+                <div class="modal-action-wrapper" style="margin-top: 25px;">
+                    <button class="modal-choice-btn cancel-round" onclick="executeCancelCurrentRoundAction()">🗑️ Cancel This Round</button>
+                    <button class="modal-choice-btn end-tournament" onclick="terminateTournamentSequence()">🏆 Complete Tournament</button>
+                    <button class="modal-choice-btn dismiss-modal" onclick="dismissLifecycleConfirmationModal()">↩️ Keep Playing</button>
+                </div>
+            `;
+            document.getElementById('status').innerText = "Ending the game calculates totals and displays all final scores.";
+        }
+
+        window.dismissLifecycleConfirmationModal = function() {
+            playBeep(440, 0.08);
+            if(turnCount > 0 && !isGameOverState) {
+                currentViewState = "GAME";
+                document.getElementById('nav-utility-shelf').style.visibility = "hidden"; 
+                isCardVisible = true;
+                const activeChit = historyPool[historyPool.length - 1];
+                const roleEl = document.getElementById('role');
+                roleEl.innerText = activeChit.name;
+                roleEl.style.color = activeChit.color;
+                document.getElementById('points').innerHTML = `<div style='font-size:1.8rem; font-weight:800; color:#ffdf00;'>Value: ${activeChit.points.toLocaleString()}</div>`;
+                document.getElementById('status').innerText = `Hey ${playerNames[turnCount - 1]}, memorize this and tap anywhere to clear!`;
+                renderActionShelf();
+            } else if(isGameOverState || isRevealIntermediateState) {
+                currentViewState = "GAME";
+                if (isRevealIntermediateState) {
+                    let chosenItem = historyPool[historyPool.length - 1];
+                    isRevealIntermediateState = false; 
+                    window.submitPoliceGuess(historyPool.findIndex(c => c.type === chosenItem.type));
+                } else {
+                    injectActiveRoundFlashingReview();
+                }
+            } else {
+                shufflePool();
+                resetForNextTurn();
+            }
+        }
+
+        window.executeCancelCurrentRoundAction = function() {
+            playBeep(200, 0.25);
+            shufflePool();
+            resetForNextTurn();
+            speakDialogue("Current round cancelled.");
+        }
+
+        window.terminateTournamentSequence = function() {
+            if (allRoundsData.length === 0) {
+                shufflePool();
+                resetForNextTurn();
+                return;
+            }
+            
+            playBeep(330, 0.3); 
+            let grandTotals = Array(playerNames.length).fill(0);
+            allRoundsData.forEach((round) => {
+                for (let pIndex = 0; pIndex < playerNames.length; pIndex++) {
+                    grandTotals[pIndex] += round[pIndex] ? round[pIndex].points : 0;
+                }
+            });
+
+            let maxScore = Math.max(...grandTotals);
+            let winnerIndex = grandTotals.indexOf(maxScore);
+            let ultimateWinnerName = playerNames[winnerIndex];
+
+            let liveStandingsHTML = `<div class='table-wrap' style='margin:15px 0; border-color:rgba(0,255,240,0.25);'><table style='background:rgba(0,0,0,0.4);'><tr><th style='width:50%;'>Player</th><th>Final Score</th></tr>`;
+            playerNames.forEach((name, index) => {
+                let isWinnerRow = (index === winnerIndex);
+                liveStandingsHTML += `<tr ${isWinnerRow ? 'style="background:rgba(255,223,0,0.08);"' : ''}><td><strong ${isWinnerRow ? 'style="color:#ffdf00;"' : ''}>${name}</strong></td><td style='color:${isWinnerRow ? '#ffdf00' : '#00fff0'}; font-weight:800;'>${grandTotals[index].toLocaleString()}</td></tr>`;
+            });
+            liveStandingsHTML += `</table></div>`;
+
+            const roleEl = document.getElementById('role');
+            roleEl.innerText = "FINALE";
+            roleEl.style.color = "#ffdf00";
+            roleEl.style.textShadow = "0 0 30px rgba(255, 223, 0, 0.6)";
+
+            document.getElementById('points').innerHTML = `
+                <div id="winner-banner" style="margin-bottom:10px;">🏆 GRAND CHAMPION: ${ultimateWinnerName}</div>
+                ${liveStandingsHTML}
+                <div style="font-size:0.9rem; color:rgba(255,255,255,0.5); line-height:1.4; padding:5px 0;">
+                    All running tournament data logs have been reset smoothly!
+                </div>
+            `;
+            document.getElementById('status').innerText = "League archived. Tap card anywhere to spin a fresh match deck.";
+
+            speakDialogue(getRandomDialogue('gameOverAnnouncement', ultimateWinnerName, maxScore.toLocaleString()));
+
+            allRoundsData = []; 
+            turnCount = 0;
+            shufflePool();
+            currentViewState = "GRAND_TOTALS"; 
+            renderActionShelf();
+        }
+
+        window.triggerNextRoundSetup = function() {
+            playBeep(440, 0.1);
+            turnCount = 0;
+            shufflePool();
+            resetForNextTurn();
+        }
+
+        window.renderGrandLeaderboard = function() {
+            currentViewState = "GRAND_TOTALS";
+            playBeep(1100, 0.15);
+            document.getElementById('interactive-card-shell').classList.remove('flash-active-frame');
+
+            let grandTotals = Array(playerNames.length).fill(0);
+            let tableHTML = `<div class='table-wrap'><table><tr><th>Rd</th>`;
+            playerNames.forEach(name => { tableHTML += `<th>${name}</th>`; });
+            tableHTML += `</tr>`;
+            
+            allRoundsData.forEach((round, rIndex) => {
+                tableHTML += `<tr><td>R${rIndex + 1}</td>`;
+                for (let pIndex = 0; pIndex < playerNames.length; pIndex++) {
+                    let pts = round[pIndex] ? round[pIndex].points : 0;
+                    grandTotals[pIndex] += pts;
+                    tableHTML += `<td style="color:${round[pIndex] ? round[pIndex].color : '#fff'}">${pts >= 1000 ? (pts / 1000) + 'k' : pts}</td>`;
+                }
+                tableHTML += `</tr>`;
+            });
+
+            tableHTML += `<tr class="total-row"><td>TOT</td>`;
+            grandTotals.forEach(total => { 
+                tableHTML += `<td>${total >= 1000 ? (total / 1000) + 'k' : total}</td>`; 
+            });
+            tableHTML += `</tr></table></div>`;
+
+            let maxScore = Math.max(...grandTotals);
+            let winnerIndex = grandTotals.indexOf(maxScore);
+
+            document.getElementById('role').innerText = "STANDINGS";
+            document.getElementById('role').style.color = "#00fff0";
+            document.getElementById('role').style.textShadow = "0 0 20px rgba(0, 255, 240, 0.3)";
+            
+            document.getElementById('points').innerHTML = `
+                <div id="winner-banner">👑 Winner: ${playerNames[winnerIndex]} (${maxScore.toLocaleString()})</div>
+                ${tableHTML}
+            `;
+            document.getElementById('status').innerText = "Aggregated standings calculated across all rounds.";
+            renderActionShelf();
+
+            speakDialogue(getRandomDialogue('leaderBoard', playerNames[winnerIndex], maxScore.toLocaleString()));
+        }
+
+        window.openSettingsDashboard = function() {
+            currentViewState = "SETTINGS";
+            playBeep(650, 0.15);
+            document.getElementById('interactive-card-shell').classList.remove('flash-active-frame');
+            document.getElementById('role').innerText = "SETTINGS";
+            document.getElementById('role').style.color = "#00fff0";
+            document.getElementById('role').style.textShadow = "0 0 20px rgba(0, 255, 240, 0.3)";
+            document.getElementById('status').innerText = "Configure profiles and roles structural properties.";
+            renderSettingsHTML();
+            initDragAndDropSortingEngine(); 
+        }
+
+        function renderSettingsHTML() {
+            let html = `<div class="settings-panel">`;
+            
+            html += `
+                <div class="settings-heading">
+                    <span>👥 Active Profiles Group (Drag ☰)</span>
+                    <button class="action-icon-btn" onclick="addNewPlayerProfileRow()">➕ Add Player</button>
+                </div>
+                <div id="sortable-player-list-container">
+            `;
+            masterPlayersList.forEach((player, i) => {
+                html += `
+                    <div class="card-wrapper sortable-player-row-item" data-index="${i}" draggable="true">
+                        <div class="input-group">
+                            <input type="checkbox" id="cfg-p-act-${i}" ${player.active ? 'checked' : ''} onchange="togglePlayerActiveState(${i})">
+                            <input type="text" id="cfg-p-name-${i}" value="${player.name}" maxlength="12" onchange="updatePlayerNameInline(${i}, this.value)">
+                            ${masterPlayersList.length > 3 ? `<button class="action-icon-btn remove" onclick="removePlayerProfileRow(${i})" style="padding: 4px 6px; font-size: 0.65rem; margin-left: 4px;">❌</button>` : ''}
+                        </div>
+                        <div class="drag-handle-column">☰</div>
+                    </div>`;
+            });
+            html += `</div>`;
+
+            html += `
+                <div class="settings-heading">
+                    <span>👑 Roles & Value Ledger</span>
+                    <button class="action-icon-btn" onclick="addNewRoleProfileRow()">➕ Add Role</button>
+                </div>
+            `;
+            masterRolesList.forEach((role, i) => {
+                html += `
+                    <div class="card-wrapper" style="background: rgba(255,255,255,0.015)">
+                        <div class="input-group">
+                            <label style="color:${role.color || '#fff'}">${role.type}:</label>
+                            <input type="text" id="cfg-r-name-${i}" value="${role.name}" style="margin-right:4px;" placeholder="Title" onchange="updateRoleNameInline(${i}, this.value)">
+                            <input type="number" id="cfg-r-pts-${i}" value="${role.points}" style="max-width:65px;" placeholder="Pts" onchange="updateRolePointsInline(${i}, this.value)">
+                            ${masterRolesList.length > 3 ? `<button class="action-icon-btn remove" onclick="removeRoleProfileRow(${i})" style="padding: 4px 6px; font-size:0.65rem; margin-left:4px;">❌</button>` : ''}
+                        </div>
+                    </div>`;
+            });
+
+            html += `</div>`;
+            document.getElementById('points').innerHTML = html;
+            renderActionShelf();
+        }
+
+        let dragSourceRowElement = null;
+
+        function initDragAndDropSortingEngine() {
+            const container = document.getElementById('sortable-player-list-container');
+            if(!container) return;
+
+            const rows = container.querySelectorAll('.sortable-player-row-item');
+            rows.forEach(row => {
+                row.addEventListener('dragstart', handleDragStartEvent, false);
+                row.addEventListener('dragover', handleDragOverEvent, false);
+                row.addEventListener('drop', handleDropEvent, false);
+                row.addEventListener('dragend', handleDragEndEvent, false);
+
+                row.addEventListener('touchstart', handleMobileTouchStart, {passive: false});
+                row.addEventListener('touchmove', handleMobileTouchMove, {passive: false});
+                row.addEventListener('touchend', handleMobileTouchEnd, false);
+            });
+        }
+
+        function handleDragStartEvent(e) {
+            dragSourceRowElement = this;
+            this.classList.add('sortable-dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', this.getAttribute('data-index'));
+        }
+
+        function handleDragOverEvent(e) {
+            if (e.preventDefault) e.preventDefault();
+            return false;
+        }
+
+        function handleDropEvent(e) {
+            if (e.stopPropagation) e.stopPropagation();
+            if (dragSourceRowElement !== this) {
+                let srcIndex = parseInt(dragSourceRowElement.getAttribute('data-index'));
+                let targetIndex = parseInt(this.getAttribute('data-index'));
+                
+                let rawMovedObject = masterPlayersList.splice(srcIndex, 1)[0];
+                masterPlayersList.splice(targetIndex, 0, rawMovedObject);
+                
+                renderSettingsHTML();
+                initDragAndDropSortingEngine(); 
+                playBeep(523, 0.04);
+            }
+            return false;
+        }
+
+        function handleDragEndEvent() { this.classList.remove('sortable-dragging'); }
+
+        let activeTouchElementRef = null;
+
+        function handleMobileTouchStart(e) {
+            if(!e.target.classList.contains('drag-handle-column')) return;
+            activeTouchElementRef = this;
+            this.classList.add('sortable-dragging');
+        }
+
+        function handleMobileTouchMove(e) {
+            if(!activeTouchElementRef) return;
+            e.preventDefault(); 
+            
+            let currentTouchLocation = e.touches[0];
+            let hoveredElement = document.elementFromPoint(currentTouchLocation.clientX, currentTouchLocation.clientY);
+            if(!hoveredElement) return;
+
+            let closestTargetRow = hoveredElement.closest('.sortable-player-row-item');
+            if(closestTargetRow && closestTargetRow !== activeTouchElementRef) {
+                let srcIdx = parseInt(activeTouchElementRef.getAttribute('data-index'));
+                let targetIdx = parseInt(closestTargetRow.getAttribute('data-index'));
+                
+                let displacedObject = masterPlayersList.splice(srcIdx, 1)[0];
+                masterPlayersList.splice(targetIdx, 0, displacedObject);
+                
+                renderSettingsHTML();
+                activeTouchElementRef = document.getElementById('sortable-player-list-container').querySelector(`[data-index="${targetIdx}"]`);
+                activeTouchElementRef.classList.add('sortable-dragging');
+                initDragAndDropSortingEngine();
+            }
+        }
+
+        function handleMobileTouchEnd() {
+            if(activeTouchElementRef) {
+                activeTouchElementRef.classList.remove('sortable-dragging');
+                activeTouchElementRef = null;
+                playBeep(523, 0.04);
+            }
+        }
+
+        window.addNewPlayerProfileRow = function() {
+            playBeep(700, 0.05);
+            masterPlayersList.push({ name: `Player ${masterPlayersList.length + 1}`, active: false });
+            renderSettingsHTML();
+            initDragAndDropSortingEngine();
+        }
+
+        window.removePlayerProfileRow = function(index) {
+            if (masterPlayersList.length <= 3) return;
+            playBeep(300, 0.08);
+            let activeCount = masterPlayersList.filter(p => p.active).length;
+            if (masterPlayersList[index].active && activeCount <= 3) {
+                alert("Minimum 3 active players are required!");
+                return;
+            }
+            masterPlayersList.splice(index, 1);
+            renderSettingsHTML();
+            initDragAndDropSortingEngine();
+        }
+
+        window.addNewRoleProfileRow = function() {
+            playBeep(700, 0.05);
+            let customRoleId = masterRolesList.length + 1;
+            masterRolesList.push({
+                name: `Praja ${customRoleId - 7}`,
+                points: 0,
+                color: "#a4b0be",
+                type: `Custom-${customRoleId}`
+            });
+            renderSettingsHTML();
+            initDragAndDropSortingEngine();
+        }
+
+        window.removeRoleProfileRow = function(index) {
+            if (masterRolesList.length <= 3) return;
+            let targetedRole = masterRolesList[index];
+            if (targetedRole.type === "Police" || targetedRole.type === "Chor") {
+                alert(`The game balance will break without a ${targetedRole.type} role card!`);
+                return;
+            }
+            playBeep(300, 0.08);
+            masterRolesList.splice(index, 1);
+            renderSettingsHTML();
+            initDragAndDropSortingEngine();
+        }
+
+        window.togglePlayerActiveState = function(i) {
+            let chk = document.getElementById(`cfg-p-act-${i}`);
+            let activeCount = masterPlayersList.filter((p, idx) => idx === i ? chk.checked : p.active).length;
+            
+            if (activeCount < 3) {
+                chk.checked = true;
+                alert("Minimum 3 active players are required!");
+                return;
+            }
+            if (activeCount > masterRolesList.length) {
+                chk.checked = false;
+                alert(`Maximum player capacity is capped at ${masterRolesList.length} roles available!`);
+                return;
+            }
+            masterPlayersList[i].active = chk.checked;
+        };
+
+        window.updatePlayerNameInline = function(i, val) { masterPlayersList[i].name = val.trim() || `Player ${i+1}`; };
+        window.updateRoleNameInline = function(i, val) { masterRolesList[i].name = val.trim() || masterRolesList[i].type; };
+        window.updateRolePointsInline = function(i, val) { masterRolesList[i].points = parseInt(val) || 0; };
+
+        window.saveAndExitSettings = function() {
+            playBeep(880, 0.1);
+            allRoundsData = []; 
+            syncActiveSettingsFramework();
+            shufflePool(); 
+            resetForNextTurn();
+        }
+
+        window.exitScoreboardView = function() {
+            playBeep(440, 0.08);
+            resetForNextTurn();
+        }
+
+        document.getElementById('interactive-card-shell').addEventListener('click', (e) => {
+            if(e.target.tagName === 'BUTTON' || e.target.tagName === 'INPUT' || e.target.closest('.drag-handle-column')) return;
+            
+            if (currentViewState === "GRAND_TOTALS" && document.getElementById('role').innerText === "FINALE") {
+                playBeep(440, 0.1);
+                resetForNextTurn();
+                return;
+            }
+            
+            if (currentViewState === "GAME") { 
+                handleScreenTap(); 
+            }
+        });
+
+        syncActiveSettingsFramework();
+        shufflePool();
+        
+        if (window.speechSynthesis) {
+            window.speechSynthesis.onvoiceschanged = function() {
+                setTimeout(() => { speakDialogue(getRandomDialogue('gameStart', playerNames[0])); }, 500);
+                window.speechSynthesis.onvoiceschanged = null; 
+            };
+            setTimeout(() => {
+                if (historyPool.length === 0 && turnCount === 0) {
+                    speakDialogue(getRandomDialogue('gameStart', playerNames[0]));
+                }
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
